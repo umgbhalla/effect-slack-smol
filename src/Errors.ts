@@ -10,11 +10,11 @@ export { ErrorCode }
  * Request error - network failures, DNS errors, etc.
  * Maps to: slack_webapi_request_error
  */
-export class SlackRequestError extends Schema.TaggedError<SlackRequestError>()(
+export class SlackRequestError extends Schema.TaggedErrorClass<SlackRequestError>()(
   "SlackRequestError",
   {
     message: Schema.String,
-    cause: Schema.optional(Schema.Defect)
+    cause: Schema.optional(Schema.Defect())
   }
 ) {}
 
@@ -22,7 +22,7 @@ export class SlackRequestError extends Schema.TaggedError<SlackRequestError>()(
  * HTTP error - non-200 responses from Slack API
  * Maps to: slack_webapi_http_error
  */
-export class SlackHttpError extends Schema.TaggedError<SlackHttpError>()("SlackHttpError", {
+export class SlackHttpError extends Schema.TaggedErrorClass<SlackHttpError>()("SlackHttpError", {
   statusCode: Schema.Number,
   statusMessage: Schema.String,
   message: Schema.String,
@@ -35,7 +35,7 @@ export class SlackHttpError extends Schema.TaggedError<SlackHttpError>()("SlackH
  *
  * The `error` field contains the Slack error code (e.g., "channel_not_found", "invalid_auth")
  */
-export class SlackPlatformError extends Schema.TaggedError<SlackPlatformError>()(
+export class SlackPlatformError extends Schema.TaggedErrorClass<SlackPlatformError>()(
   "SlackPlatformError",
   {
     error: Schema.String,
@@ -61,7 +61,7 @@ export class SlackPlatformError extends Schema.TaggedError<SlackPlatformError>()
  * Rate limited error - too many requests
  * Maps to: slack_webapi_rate_limited_error
  */
-export class SlackRateLimitedError extends Schema.TaggedError<SlackRateLimitedError>()(
+export class SlackRateLimitedError extends Schema.TaggedErrorClass<SlackRateLimitedError>()(
   "SlackRateLimitedError",
   {
     retryAfter: Schema.Number,
@@ -73,7 +73,7 @@ export class SlackRateLimitedError extends Schema.TaggedError<SlackRateLimitedEr
  * File upload error - invalid arguments for file upload
  * Maps to: slack_webapi_file_upload_invalid_args_error
  */
-export class SlackFileUploadInvalidArgumentsError extends Schema.TaggedError<SlackFileUploadInvalidArgumentsError>()(
+export class SlackFileUploadInvalidArgumentsError extends Schema.TaggedErrorClass<SlackFileUploadInvalidArgumentsError>()(
   "SlackFileUploadInvalidArgumentsError",
   {
     message: Schema.String,
@@ -85,22 +85,22 @@ export class SlackFileUploadInvalidArgumentsError extends Schema.TaggedError<Sla
  * File upload read error - failed to read file data
  * Maps to: slack_webapi_file_upload_read_file_data_error
  */
-export class SlackFileUploadReadError extends Schema.TaggedError<SlackFileUploadReadError>()(
+export class SlackFileUploadReadError extends Schema.TaggedErrorClass<SlackFileUploadReadError>()(
   "SlackFileUploadReadError",
   {
     message: Schema.String,
-    cause: Schema.optional(Schema.Defect)
+    cause: Schema.optional(Schema.Defect())
   }
 ) {}
 
 /**
  * Unknown error - catch-all for unexpected errors
  */
-export class SlackUnknownError extends Schema.TaggedError<SlackUnknownError>()(
+export class SlackUnknownError extends Schema.TaggedErrorClass<SlackUnknownError>()(
   "SlackUnknownError",
   {
     message: Schema.String,
-    cause: Schema.Defect
+    cause: Schema.Defect()
   }
 ) {}
 

@@ -3,8 +3,7 @@
  */
 import * as path from "node:path"
 
-import { FileSystem } from "@effect/platform"
-import { Effect, Console, Either } from "effect"
+import { Effect, Console, Result, FileSystem } from "effect"
 
 import { generateAllFiles } from "./codegen.js"
 import {
@@ -80,7 +79,7 @@ const ensureDir = (dirPath: string) =>
  */
 const parseNamespaces = (content: string) => {
   const result = parseMethodsSource(content)
-  return Either.isRight(result) ? Effect.succeed(result.right) : Effect.fail(result.left)
+  return Result.isSuccess(result) ? Effect.succeed(result.success) : Effect.fail(result.failure)
 }
 
 /**

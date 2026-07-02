@@ -1,5 +1,5 @@
 import { describe, it } from "@effect/vitest"
-import { Either } from "effect"
+import { Result } from "effect"
 import { assert } from "vitest"
 
 import { parseMethodsSource, getJsDocInfo } from "../../scripts/lib/parser.js"
@@ -78,10 +78,10 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isRight(result))
+      assert.isTrue(Result.isSuccess(result))
 
-      if (Either.isRight(result)) {
-        const namespaces = result.right
+      if (Result.isSuccess(result)) {
+        const namespaces = result.success
         assert.strictEqual(namespaces.length, 1)
         assert.strictEqual(namespaces[0].name, "chat")
         assert.strictEqual(namespaces[0].methods.length, 2)
@@ -103,10 +103,10 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isRight(result))
+      assert.isTrue(Result.isSuccess(result))
 
-      if (Either.isRight(result)) {
-        assert.isTrue(result.right[0].methods[0].isOptionalArgs)
+      if (Result.isSuccess(result)) {
+        assert.isTrue(result.success[0].methods[0].isOptionalArgs)
       }
     })
 
@@ -126,10 +126,10 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isRight(result))
+      assert.isTrue(Result.isSuccess(result))
 
-      if (Either.isRight(result)) {
-        const chat = result.right[0]
+      if (Result.isSuccess(result)) {
+        const chat = result.success[0]
         assert.strictEqual(chat.methods.length, 1)
         assert.strictEqual(chat.subNamespaces.length, 1)
         assert.strictEqual(chat.subNamespaces[0].name, "scheduledMessages")
@@ -153,10 +153,10 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isRight(result))
+      assert.isTrue(Result.isSuccess(result))
 
-      if (Either.isRight(result)) {
-        const admin = result.right[0]
+      if (Result.isSuccess(result)) {
+        const admin = result.success[0]
         assert.strictEqual(admin.subNamespaces[0].name, "apps")
         assert.strictEqual(admin.subNamespaces[0].subNamespaces[0].name, "approved")
         assert.strictEqual(
@@ -180,11 +180,11 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isRight(result))
+      assert.isTrue(Result.isSuccess(result))
 
-      if (Either.isRight(result)) {
-        assert.strictEqual(result.right.length, 1)
-        assert.strictEqual(result.right[0].name, "chat")
+      if (Result.isSuccess(result)) {
+        assert.strictEqual(result.success.length, 1)
+        assert.strictEqual(result.success[0].name, "chat")
       }
     })
 
@@ -196,10 +196,10 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isLeft(result))
+      assert.isTrue(Result.isFailure(result))
 
-      if (Either.isLeft(result)) {
-        assert.strictEqual(result.left._tag, "MethodsClassNotFoundError")
+      if (Result.isFailure(result)) {
+        assert.strictEqual(result.failure._tag, "MethodsClassNotFoundError")
       }
     })
 
@@ -222,12 +222,12 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isRight(result))
+      assert.isTrue(Result.isSuccess(result))
 
-      if (Either.isRight(result)) {
-        assert.strictEqual(result.right.length, 3)
+      if (Result.isSuccess(result)) {
+        assert.strictEqual(result.success.length, 3)
         assert.deepStrictEqual(
-          result.right.map((n) => n.name),
+          result.success.map((n) => n.name),
           ["chat", "users", "reactions"]
         )
       }
@@ -245,10 +245,10 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isRight(result))
+      assert.isTrue(Result.isSuccess(result))
 
-      if (Either.isRight(result)) {
-        const method = result.right[0].methods[0]
+      if (Result.isSuccess(result)) {
+        const method = result.success[0].methods[0]
         assert.strictEqual(method.argsType, "ChatPostMessageArguments")
         assert.strictEqual(method.responseType, "ChatPostMessageResponse")
       }
@@ -261,10 +261,10 @@ describe("Parser", () => {
       `
 
       const result = parseMethodsSource(source)
-      assert.isTrue(Either.isRight(result))
+      assert.isTrue(Result.isSuccess(result))
 
-      if (Either.isRight(result)) {
-        assert.strictEqual(result.right.length, 0)
+      if (Result.isSuccess(result)) {
+        assert.strictEqual(result.success.length, 0)
       }
     })
   })

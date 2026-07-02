@@ -1,6 +1,6 @@
-import { HttpApiBuilder } from "@effect/platform"
 import { Effect, Layer } from "effect"
 import { SlackService } from "effect-slack"
+import { HttpApiBuilder } from "effect/unstable/httpapi"
 
 import { SlackBotApi } from "./Api.js"
 import { SlashCommandResponse, SlackApiError } from "./Schemas.js"
@@ -28,7 +28,7 @@ export const CommandsLive = HttpApiBuilder.group(SlackBotApi, "commands", (handl
               })
               .pipe(
                 Effect.tapError((error) => Effect.logError("Failed to post greeting", { error })),
-                Effect.catchAll(
+                Effect.catch(
                   (error) =>
                     new SlackApiError({
                       message: `Failed to send greeting: ${String(error)}`

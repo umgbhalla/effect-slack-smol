@@ -1,7 +1,8 @@
-import { HttpApiBuilder, HttpApiSwagger, HttpMiddleware, HttpServer } from "@effect/platform"
 import { BunHttpServer, BunRuntime } from "@effect/platform-bun"
 import { Effect, Layer } from "effect"
 import { SlackConfig } from "effect-slack"
+import { HttpRouter } from "effect/unstable/http"
+import { HttpApiBuilder, HttpApiSwagger } from "effect/unstable/httpapi"
 
 import { SlackBotApi } from "./Api.js"
 import { AppConfig } from "./Config.js"
@@ -21,7 +22,7 @@ const HealthLive = HttpApiBuilder.group(SlackBotApi, "health", (handlers) =>
 // API Implementation
 // =============================================================================
 
-const ApiLive = HttpApiBuilder.api(SlackBotApi).pipe(
+const ApiLive = HttpApiBuilder.layer(SlackBotApi).pipe(
   Layer.provide(EventsLive),
   Layer.provide(CommandsLive),
   Layer.provide(HealthLive)
@@ -31,22 +32,21 @@ const ApiLive = HttpApiBuilder.api(SlackBotApi).pipe(
 // Server Configuration
 // =============================================================================
 
-const HttpServerLive = Layer.unwrapEffect(
+const HttpServerLive = Layer.unwrap(
   Effect.gen(function* () {
     const config = yield* AppConfig
     return BunHttpServer.layer({ port: config.port })
   })
 )
 
-const ServerLive = HttpApiBuilder.serve(HttpMiddleware.logger).pipe(
+const RouterLive = ApiLive.pipe(
   // Add Swagger documentation at /docs
-  Layer.provide(HttpApiSwagger.layer({ path: "/docs" })),
+  Layer.provide(HttpApiSwagger.layer(SlackBotApi, { path: "/docs" })),
   // Add CORS support
-  Layer.provide(HttpApiBuilder.middlewareCors()),
-  // Provide the API implementation
-  Layer.provide(ApiLive),
-  // Log server address on startup
-  HttpServer.withLogAddress,
+  Layer.provide(HttpRouter.cors())
+)
+
+const ServerLive = HttpRouter.serve(RouterLive).pipe(
   // Configure the HTTP server with port from config
   Layer.provide(HttpServerLive),
   // Provide Slack configuration from environment

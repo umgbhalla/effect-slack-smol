@@ -159,8 +159,8 @@ bun run start
 ## Learn More
 
 - [effect-slack documentation](https://github.com/mateokruk/effect-slack)
-- [Effect documentation](https://effect.website)
-- [@effect/platform documentation](https://effect.website/docs/guides/platform/introduction)
+- [Effect v4 beta documentation](https://effect-ts-effect-smol.mintlify.app/)
+- [Effect v4 HTTP API documentation](https://effect-ts-effect-smol.mintlify.app/installation)
 - [Slack API documentation](https://api.slack.com/docs)
 
 ## License

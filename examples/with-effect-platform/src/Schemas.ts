@@ -1,4 +1,3 @@
-import { HttpApiSchema } from "@effect/platform"
 import { Schema } from "effect"
 
 // =============================================================================
@@ -32,7 +31,7 @@ export class SlackAppMentionEvent extends Schema.Class<SlackAppMentionEvent>(
   event_ts: Schema.String
 }) {}
 
-export const SlackEvent = Schema.Union(SlackMessageEvent, SlackAppMentionEvent)
+export const SlackEvent = Schema.Union([SlackMessageEvent, SlackAppMentionEvent])
 export type SlackEvent = typeof SlackEvent.Type
 
 export class SlackEventCallback extends Schema.Class<SlackEventCallback>("SlackEventCallback")({
@@ -45,7 +44,7 @@ export class SlackEventCallback extends Schema.Class<SlackEventCallback>("SlackE
   event_time: Schema.Number
 }) {}
 
-export const SlackEventPayload = Schema.Union(SlackChallenge, SlackEventCallback)
+export const SlackEventPayload = Schema.Union([SlackChallenge, SlackEventCallback])
 export type SlackEventPayload = typeof SlackEventPayload.Type
 
 // =============================================================================
@@ -79,7 +78,7 @@ export class EventAckResponse extends Schema.Class<EventAckResponse>("EventAckRe
 export class SlashCommandResponse extends Schema.Class<SlashCommandResponse>(
   "SlashCommandResponse"
 )({
-  response_type: Schema.optional(Schema.Literal("in_channel", "ephemeral")),
+  response_type: Schema.optional(Schema.Literals(["in_channel", "ephemeral"])),
   text: Schema.optional(Schema.String),
   blocks: Schema.optional(Schema.Array(Schema.Unknown))
 }) {}
@@ -92,14 +91,14 @@ export class HealthResponse extends Schema.Class<HealthResponse>("HealthResponse
 // Error Types
 // =============================================================================
 
-export class SignatureVerificationError extends Schema.TaggedError<SignatureVerificationError>()(
+export class SignatureVerificationError extends Schema.TaggedErrorClass<SignatureVerificationError>()(
   "SignatureVerificationError",
   { message: Schema.String },
-  HttpApiSchema.annotations({ status: 401 })
+  { httpApiStatus: 401 }
 ) {}
 
-export class SlackApiError extends Schema.TaggedError<SlackApiError>()(
+export class SlackApiError extends Schema.TaggedErrorClass<SlackApiError>()(
   "SlackApiError",
   { message: Schema.String },
-  HttpApiSchema.annotations({ status: 500 })
+  { httpApiStatus: 500 }
 ) {}

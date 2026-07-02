@@ -1,12 +1,12 @@
-import { Context, Effect, Layer, Config, Redacted, type ConfigError } from "effect"
+import { Context, Effect, Layer, Config, Redacted } from "effect"
 
 export interface AppConfigShape {
   readonly signingSecret: Redacted.Redacted<string>
   readonly port: number
 }
 
-export class AppConfig extends Context.Tag("app/AppConfig")<AppConfig, AppConfigShape>() {
-  static readonly fromEnv: Layer.Layer<AppConfig, ConfigError.ConfigError> = Layer.effect(
+export class AppConfig extends Context.Service<AppConfig, AppConfigShape>()("app/AppConfig") {
+  static readonly fromEnv: Layer.Layer<AppConfig, Config.ConfigError> = Layer.effect(
     AppConfig,
     Effect.gen(function* () {
       const signingSecret = yield* Config.redacted("SLACK_SIGNING_SECRET")

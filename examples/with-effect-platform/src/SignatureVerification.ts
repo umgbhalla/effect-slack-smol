@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto"
 
-import { HttpServerRequest } from "@effect/platform"
 import { Effect, Redacted } from "effect"
+import { HttpServerRequest } from "effect/unstable/http"
 
 import { AppConfig } from "./Config.js"
 import { SignatureVerificationError } from "./Schemas.js"

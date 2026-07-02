@@ -14,7 +14,7 @@ import {
 
 describe("Slack Errors", () => {
   describe("SlackRequestError", () => {
-    it.scoped("should be yieldable with cause", () =>
+    it.effect("should be yieldable with cause", () =>
       Effect.gen(function* () {
         const originalError = new Error("Network failure")
         const error = yield* Effect.flip(
@@ -33,7 +33,7 @@ describe("Slack Errors", () => {
   })
 
   describe("SlackHttpError", () => {
-    it.scoped("should contain HTTP response details", () =>
+    it.effect("should contain HTTP response details", () =>
       Effect.gen(function* () {
         const error = new SlackHttpError({
           statusCode: 500,
@@ -50,7 +50,7 @@ describe("Slack Errors", () => {
   })
 
   describe("SlackPlatformError", () => {
-    it.scoped("should contain Slack error code", () =>
+    it.effect("should contain Slack error code", () =>
       Effect.gen(function* () {
         const error = new SlackPlatformError({
           error: "channel_not_found",
@@ -62,7 +62,7 @@ describe("Slack Errors", () => {
       })
     )
 
-    it.scoped("should detect auth errors", () =>
+    it.effect("should detect auth errors", () =>
       Effect.gen(function* () {
         const authError = new SlackPlatformError({
           error: "invalid_auth",
@@ -78,7 +78,7 @@ describe("Slack Errors", () => {
       })
     )
 
-    it.scoped("should detect all auth error types", () =>
+    it.effect("should detect all auth error types", () =>
       Effect.gen(function* () {
         const authErrors = [
           "invalid_auth",
@@ -100,7 +100,7 @@ describe("Slack Errors", () => {
   })
 
   describe("SlackRateLimitedError", () => {
-    it.scoped("should include retry info", () =>
+    it.effect("should include retry info", () =>
       Effect.gen(function* () {
         const error = new SlackRateLimitedError({
           retryAfter: 30,
@@ -113,7 +113,7 @@ describe("Slack Errors", () => {
   })
 
   describe("SlackFileUploadInvalidArgumentsError", () => {
-    it.scoped("should contain error details", () =>
+    it.effect("should contain error details", () =>
       Effect.gen(function* () {
         const error = new SlackFileUploadInvalidArgumentsError({
           message: "Invalid file arguments",
@@ -126,7 +126,7 @@ describe("Slack Errors", () => {
   })
 
   describe("SlackFileUploadReadError", () => {
-    it.scoped("should contain cause", () =>
+    it.effect("should contain cause", () =>
       Effect.gen(function* () {
         const originalError = new Error("File not found")
         const error = new SlackFileUploadReadError({
@@ -140,7 +140,7 @@ describe("Slack Errors", () => {
   })
 
   describe("SlackUnknownError", () => {
-    it.scoped("should wrap unknown errors", () =>
+    it.effect("should wrap unknown errors", () =>
       Effect.gen(function* () {
         const originalError = { weird: "error" }
         const error = new SlackUnknownError({
@@ -154,7 +154,7 @@ describe("Slack Errors", () => {
   })
 
   describe("Error catching", () => {
-    it.scoped("errors can be caught by tag", () =>
+    it.effect("errors can be caught by tag", () =>
       Effect.gen(function* () {
         const program = Effect.gen(function* () {
           return yield* new SlackPlatformError({
@@ -168,7 +168,7 @@ describe("Slack Errors", () => {
       })
     )
 
-    it.scoped("errors can be caught with catchTags", () =>
+    it.effect("errors can be caught with catchTags", () =>
       Effect.gen(function* () {
         const program = Effect.gen(function* () {
           return yield* new SlackRateLimitedError({

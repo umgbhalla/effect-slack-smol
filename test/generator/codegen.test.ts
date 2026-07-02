@@ -30,10 +30,10 @@ describe("Codegen", () => {
         "postMessage"
       )
 
-      assert.include(code, "const postMessage = (")
+      assert.include(code, 'const postMessage = Effect.fn("ChatService.postMessage"')
       assert.include(code, "args: ChatPostMessageArguments")
       assert.include(code, "Effect.Effect<ChatPostMessageResponse, SlackError>")
-      assert.include(code, 'Effect.withSpan("ChatService.postMessage"')
+      assert.include(code, "Effect.tapError(annotateSpanWithError)")
       assert.include(code, '"slack.method": "chat.postMessage"')
     })
 
@@ -308,17 +308,22 @@ describe("Codegen", () => {
 
       assert.include(content, "Generated Slack Chat Service")
       assert.include(content, "DO NOT EDIT")
-      assert.include(content, 'import { Effect } from "effect"')
+      assert.include(content, 'import { Context, Effect, Layer } from "effect"')
       assert.include(content, "ChatPostMessageArguments")
       assert.include(content, "ChatPostMessageResponse")
+      assert.include(content, 'import { SlackConfig } from "../SlackConfig.js"')
       assert.include(content, 'import { SlackClient } from "../SlackClient.js"')
-      assert.include(content, "export class ChatService extends Effect.Service<ChatService>()")
+      assert.include(content, "export class ChatService extends Context.Service<ChatService>()")
       assert.include(content, '"effect-slack/ChatService"')
       assert.include(content, "const client = yield* SlackClient")
       assert.include(content, "return {")
       assert.include(content, "postMessage")
       assert.include(content, "} as const")
-      assert.include(content, "dependencies: [SlackClient.Default]")
+      assert.include(content, "static readonly layer: Layer.Layer<ChatService, never, SlackClient>")
+      assert.include(
+        content,
+        "static readonly Default: Layer.Layer<ChatService, never, SlackConfig>"
+      )
     })
 
     it("generates service with nested namespaces", () => {

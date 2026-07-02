@@ -1,5 +1,5 @@
 import type { WebClientOptions } from "@slack/web-api"
-import { Context, Effect, Layer, Config, Redacted, type ConfigError } from "effect"
+import { Context, Effect, Layer, Config, Redacted } from "effect"
 
 /**
  * Slack configuration interface
@@ -12,19 +12,18 @@ export interface SlackConfigShape {
 /**
  * SlackConfig service tag
  */
-export class SlackConfig extends Context.Tag("effect-slack/SlackConfig")<
-  SlackConfig,
-  SlackConfigShape
->() {
+export class SlackConfig extends Context.Service<SlackConfig, SlackConfigShape>()(
+  "effect-slack/SlackConfig"
+) {
   /**
    * Create config layer from environment variables
    * Expects SLACK_TOKEN environment variable
    */
-  static readonly fromEnv: Layer.Layer<SlackConfig, ConfigError.ConfigError> = Layer.effect(
+  static readonly fromEnv: Layer.Layer<SlackConfig, Config.ConfigError> = Layer.effect(
     SlackConfig,
     Effect.gen(function* () {
       const token = yield* Config.redacted("SLACK_TOKEN")
-      return { token }
+      return SlackConfig.of({ token })
     })
   )
 
@@ -32,5 +31,5 @@ export class SlackConfig extends Context.Tag("effect-slack/SlackConfig")<
    * Create config layer from explicit values
    */
   static readonly make = (config: SlackConfigShape): Layer.Layer<SlackConfig> =>
-    Layer.succeed(SlackConfig, config)
+    Layer.succeed(SlackConfig, SlackConfig.of(config))
 }

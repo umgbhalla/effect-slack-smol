@@ -1,4 +1,4 @@
-import { Either } from "effect"
+import { Result } from "effect"
 /**
  * Pure TypeScript AST parsing for the code generator
  */
@@ -40,12 +40,12 @@ export const getJsDocInfo = (fullText: string): JsDocInfo => {
 
 /**
  * Parse a TypeScript source string into NamespaceInfo array
- * Returns Either to allow for parsing errors
+ * Returns Result to allow for parsing errors
  */
 export const parseMethodsSource = (
   source: string,
   filename = "methods.d.ts"
-): Either.Either<readonly NamespaceInfo[], MethodsClassNotFoundError> => {
+): Result.Result<readonly NamespaceInfo[], MethodsClassNotFoundError> => {
   const sourceFile = ts.createSourceFile(filename, source, ts.ScriptTarget.Latest, true)
 
   const namespaces: NamespaceInfo[] = []
@@ -74,14 +74,14 @@ export const parseMethodsSource = (
   visit(sourceFile)
 
   if (!foundMethodsClass) {
-    return Either.left(
+    return Result.fail(
       new MethodsClassNotFoundError({
         message: "Could not find 'Methods' class in source"
       })
     )
   }
 
-  return Either.right(namespaces)
+  return Result.succeed(namespaces)
 }
 
 /**

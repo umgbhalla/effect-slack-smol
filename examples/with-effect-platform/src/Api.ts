@@ -1,4 +1,5 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from "@effect/platform"
+import { Schema } from "effect"
+import { HttpApi, HttpApiEndpoint, HttpApiGroup, HttpApiSchema } from "effect/unstable/httpapi"
 
 import {
   SlackEventPayload,
@@ -16,12 +17,11 @@ import {
 // =============================================================================
 
 const EventsGroup = HttpApiGroup.make("events").add(
-  HttpApiEndpoint.post("handleEvent", "/slack/events")
-    .setPayload(SlackEventPayload.pipe(HttpApiSchema.withEncoding({ kind: "Json" })))
-    .addSuccess(ChallengeResponse)
-    .addSuccess(EventAckResponse)
-    .addError(SignatureVerificationError)
-    .addError(SlackApiError)
+  HttpApiEndpoint.post("handleEvent", "/slack/events", {
+    payload: SlackEventPayload.pipe(HttpApiSchema.asJson()),
+    success: Schema.Union([ChallengeResponse, EventAckResponse]),
+    error: [SignatureVerificationError, SlackApiError]
+  })
 )
 
 // =============================================================================
@@ -29,11 +29,11 @@ const EventsGroup = HttpApiGroup.make("events").add(
 // =============================================================================
 
 const CommandsGroup = HttpApiGroup.make("commands").add(
-  HttpApiEndpoint.post("handleCommand", "/slack/commands")
-    .setPayload(SlashCommandPayload.pipe(HttpApiSchema.withEncoding({ kind: "UrlParams" })))
-    .addSuccess(SlashCommandResponse)
-    .addError(SignatureVerificationError)
-    .addError(SlackApiError)
+  HttpApiEndpoint.post("handleCommand", "/slack/commands", {
+    payload: SlashCommandPayload.pipe(HttpApiSchema.asFormUrlEncoded()),
+    success: SlashCommandResponse,
+    error: [SignatureVerificationError, SlackApiError]
+  })
 )
 
 // =============================================================================
@@ -41,7 +41,7 @@ const CommandsGroup = HttpApiGroup.make("commands").add(
 // =============================================================================
 
 const HealthGroup = HttpApiGroup.make("health", { topLevel: true }).add(
-  HttpApiEndpoint.get("health", "/health").addSuccess(HealthResponse)
+  HttpApiEndpoint.get("health", "/health", { success: HealthResponse })
 )
 
 // =============================================================================

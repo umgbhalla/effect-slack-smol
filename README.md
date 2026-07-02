@@ -4,7 +4,7 @@ An Effect-native Slack SDK ✨
 
 ## Features
 
-- **100% Type-safe** — Full TypeScript types for all 272 methods, arguments, and responses
+- **100% Type-safe** — Full TypeScript types for all 273 methods, arguments, and responses
 - **Typed errors** — Discriminated unions with `catchTag`/`catchTags` for precise error handling
 - **Observability built-in** — OpenTelemetry spans with rich attributes (method, channel, user, timestamps)
 - **Smart retries** — Rate limit aware with exponential backoff and jitter
@@ -53,7 +53,7 @@ Check out the [examples](./examples) folder for complete, runnable examples:
 
 ```typescript
 import { Effect, Layer, Redacted } from "effect"
-import { SlackService, SlackConfig, SlackClient } from "effect-slack"
+import { SlackService, SlackConfig } from "effect-slack"
 
 const customConfig = SlackConfig.make({
   token: Redacted.make(process.env.MY_SLACK_TOKEN!),
@@ -63,7 +63,6 @@ const customConfig = SlackConfig.make({
 })
 
 const CustomSlackLayer = SlackService.Default.pipe(
-  Layer.provide(SlackClient.Default),
   Layer.provide(customConfig)
 )
 
@@ -245,7 +244,7 @@ Effect.runPromise(program.pipe(Effect.provide(SlackService.Live), Effect.provide
 
 ## Available Methods
 
-The library provides **272 methods** across **33 services**, auto-generated from the official `@slack/web-api` types. Services include:
+The library provides **273 methods** across **33 services**, auto-generated from the official `@slack/web-api` types. Services include:
 
 - **ChatService** - Messages, threads, scheduled messages
 - **ConversationsService** - Channels, DMs, group conversations
@@ -274,7 +273,7 @@ const mockClient = {
 } as unknown as WebClient
 
 // Create test layer
-const TestLayer = SlackService.Default.pipe(Layer.provide(SlackClient.make(mockClient)))
+const TestLayer = SlackService.layer.pipe(Layer.provide(SlackClient.make(mockClient)))
 
 // Use in tests
 const testProgram = Effect.gen(function* () {
@@ -302,19 +301,15 @@ Services are auto-generated from the `@slack/web-api` TypeScript definitions:
 Generated services follow a consistent pattern:
 
 ```typescript
-// Each method is wrapped with Effect.tryPromise, error mapping, and tracing
-const postMessage = (
-  args: ChatPostMessageArguments
-): Effect.Effect<ChatPostMessageResponse, SlackError> =>
+// Each method is wrapped with Effect.fn, Effect.tryPromise, and typed error mapping
+const postMessage = Effect.fn("ChatService.postMessage", {
+  attributes: { "slack.method": "chat.postMessage" }
+})((args: ChatPostMessageArguments): Effect.Effect<ChatPostMessageResponse, SlackError> =>
   Effect.tryPromise({
     try: () => client.chat.postMessage(args),
     catch: mapSlackError
-  }).pipe(
-    Effect.tapError(annotateSpanWithError),
-    Effect.withSpan("ChatService.postMessage", {
-      attributes: { "slack.method": "chat.postMessage" }
-    })
-  )
+  }).pipe(Effect.tapError(annotateSpanWithError))
+)
 ```
 
 Run `bun run generate` to regenerate services when updating `@slack/web-api`.

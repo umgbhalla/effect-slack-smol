@@ -23,21 +23,21 @@ import {
 
 describe("Retry utilities", () => {
   describe("isRetryableError", () => {
-    it.scoped("SlackRateLimitedError is retryable", () =>
+    it.effect("SlackRateLimitedError is retryable", () =>
       Effect.gen(function* () {
         const error = new SlackRateLimitedError({ retryAfter: 30, message: "Rate limited" })
         assert.strictEqual(isRetryableError(error), true)
       })
     )
 
-    it.scoped("SlackRequestError is retryable", () =>
+    it.effect("SlackRequestError is retryable", () =>
       Effect.gen(function* () {
         const error = new SlackRequestError({ message: "Network error" })
         assert.strictEqual(isRetryableError(error), true)
       })
     )
 
-    it.scoped("SlackHttpError 5xx is retryable", () =>
+    it.effect("SlackHttpError 5xx is retryable", () =>
       Effect.gen(function* () {
         const error500 = new SlackHttpError({
           statusCode: 500,
@@ -55,7 +55,7 @@ describe("Retry utilities", () => {
       })
     )
 
-    it.scoped("SlackHttpError 4xx is NOT retryable", () =>
+    it.effect("SlackHttpError 4xx is NOT retryable", () =>
       Effect.gen(function* () {
         const error400 = new SlackHttpError({
           statusCode: 400,
@@ -73,7 +73,7 @@ describe("Retry utilities", () => {
       })
     )
 
-    it.scoped("SlackPlatformError service_unavailable is retryable", () =>
+    it.effect("SlackPlatformError service_unavailable is retryable", () =>
       Effect.gen(function* () {
         const error = new SlackPlatformError({
           error: "service_unavailable",
@@ -83,7 +83,7 @@ describe("Retry utilities", () => {
       })
     )
 
-    it.scoped("SlackPlatformError internal_error is retryable", () =>
+    it.effect("SlackPlatformError internal_error is retryable", () =>
       Effect.gen(function* () {
         const error = new SlackPlatformError({
           error: "internal_error",
@@ -93,7 +93,7 @@ describe("Retry utilities", () => {
       })
     )
 
-    it.scoped("SlackPlatformError auth errors are NOT retryable", () =>
+    it.effect("SlackPlatformError auth errors are NOT retryable", () =>
       Effect.gen(function* () {
         const authErrors = [
           "invalid_auth",
@@ -116,7 +116,7 @@ describe("Retry utilities", () => {
       })
     )
 
-    it.scoped("SlackPlatformError other errors are NOT retryable", () =>
+    it.effect("SlackPlatformError other errors are NOT retryable", () =>
       Effect.gen(function* () {
         const error = new SlackPlatformError({
           error: "channel_not_found",
@@ -126,21 +126,21 @@ describe("Retry utilities", () => {
       })
     )
 
-    it.scoped("SlackFileUploadInvalidArgumentsError is NOT retryable", () =>
+    it.effect("SlackFileUploadInvalidArgumentsError is NOT retryable", () =>
       Effect.gen(function* () {
         const error = new SlackFileUploadInvalidArgumentsError({ message: "Invalid args" })
         assert.strictEqual(isRetryableError(error), false)
       })
     )
 
-    it.scoped("SlackFileUploadReadError is NOT retryable", () =>
+    it.effect("SlackFileUploadReadError is NOT retryable", () =>
       Effect.gen(function* () {
         const error = new SlackFileUploadReadError({ message: "Read error" })
         assert.strictEqual(isRetryableError(error), false)
       })
     )
 
-    it.scoped("SlackUnknownError is NOT retryable", () =>
+    it.effect("SlackUnknownError is NOT retryable", () =>
       Effect.gen(function* () {
         const error = new SlackUnknownError({ message: "Unknown", cause: new Error("unknown") })
         assert.strictEqual(isRetryableError(error), false)
@@ -149,39 +149,39 @@ describe("Retry utilities", () => {
   })
 
   describe("Pre-built schedules", () => {
-    it.scoped("tenRetriesInAboutThirtyMinutes is a valid schedule", () =>
+    it.effect("tenRetriesInAboutThirtyMinutes is a valid schedule", () =>
       Effect.gen(function* () {
         assert.ok(Schedule.isSchedule(tenRetriesInAboutThirtyMinutes))
       })
     )
 
-    it.scoped("fiveRetriesInFiveMinutes is a valid schedule", () =>
+    it.effect("fiveRetriesInFiveMinutes is a valid schedule", () =>
       Effect.gen(function* () {
         assert.ok(Schedule.isSchedule(fiveRetriesInFiveMinutes))
       })
     )
 
-    it.scoped("rapidRetryPolicy is a valid schedule", () =>
+    it.effect("rapidRetryPolicy is a valid schedule", () =>
       Effect.gen(function* () {
         assert.ok(Schedule.isSchedule(rapidRetryPolicy))
       })
     )
 
-    it.scoped("rateLimitAwareSchedule returns a valid schedule", () =>
+    it.effect("rateLimitAwareSchedule returns a valid schedule", () =>
       Effect.gen(function* () {
         const schedule = rateLimitAwareSchedule()
         assert.ok(Schedule.isSchedule(schedule))
       })
     )
 
-    it.scoped("rateLimitAwareSchedule accepts options", () =>
+    it.effect("rateLimitAwareSchedule accepts options", () =>
       Effect.gen(function* () {
         const schedule = rateLimitAwareSchedule({ maxRetries: 3, baseDelay: "500 millis" })
         assert.ok(Schedule.isSchedule(schedule))
       })
     )
 
-    it.scoped("Schedules namespace exports all schedules", () =>
+    it.effect("Schedules namespace exports all schedules", () =>
       Effect.gen(function* () {
         assert.ok(Schedule.isSchedule(Schedules.tenRetriesInAboutThirtyMinutes))
         assert.ok(Schedule.isSchedule(Schedules.fiveRetriesInFiveMinutes))
@@ -192,19 +192,19 @@ describe("Retry utilities", () => {
   })
 
   describe("Retry helpers", () => {
-    it.scoped("withDefaultRetry is a function", () =>
+    it.effect("withDefaultRetry is a function", () =>
       Effect.gen(function* () {
         assert.strictEqual(typeof withDefaultRetry, "function")
       })
     )
 
-    it.scoped("withRateLimitRetry is a function", () =>
+    it.effect("withRateLimitRetry is a function", () =>
       Effect.gen(function* () {
         assert.strictEqual(typeof withRateLimitRetry, "function")
       })
     )
 
-    it.scoped("withRateLimitOnlyRetry does not retry non-rate-limit errors", () =>
+    it.effect("withRateLimitOnlyRetry does not retry non-rate-limit errors", () =>
       Effect.gen(function* () {
         let attempts = 0
         const makeEffect = () =>
@@ -214,9 +214,9 @@ describe("Retry utilities", () => {
           })
 
         const result = yield* withRateLimitOnlyRetry(makeEffect(), { maxRetries: 3 }).pipe(
-          Effect.either
+          Effect.result
         )
-        assert.ok(result._tag === "Left")
+        assert.ok(result._tag === "Failure")
         assert.strictEqual(attempts, 1) // Should not retry network errors
       })
     )

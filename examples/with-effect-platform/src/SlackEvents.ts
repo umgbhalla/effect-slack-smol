@@ -1,6 +1,6 @@
-import { HttpApiBuilder } from "@effect/platform"
 import { Effect, Layer } from "effect"
 import { SlackService } from "effect-slack"
+import { HttpApiBuilder } from "effect/unstable/httpapi"
 
 import { SlackBotApi } from "./Api.js"
 import {
@@ -42,7 +42,7 @@ export const EventsLive = HttpApiBuilder.group(SlackBotApi, "events", (handlers)
               })
               .pipe(
                 Effect.tapError((error) => Effect.logError("Failed to post message", { error })),
-                Effect.catchAll(
+                Effect.catch(
                   (error) =>
                     new SlackApiError({
                       message: `Failed to respond to mention: ${String(error)}`

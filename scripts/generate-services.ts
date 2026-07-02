@@ -29,7 +29,7 @@ const main = program.pipe(
       yield* Effect.fail(error)
     })
   ),
-  Effect.catchAll((error) =>
+  Effect.catch((error) =>
     Effect.gen(function* () {
       console.error("ERROR:", error)
       yield* Effect.fail(error)

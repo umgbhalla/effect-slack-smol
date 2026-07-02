@@ -113,13 +113,13 @@ const TestLayer = Layer.effect(
       removeReaction,
       uploadFile,
       apiCall
-    } as unknown as Effect.Effect.Success<typeof SlackService.Default>
+    } satisfies Effect.Effect.Success<typeof SlackService.make>
   })
 )
 
 describe("SlackService", () => {
   describe("Chat methods", () => {
-    it.scoped("postMessage should send a message", () =>
+    it.effect("postMessage should send a message", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.postMessage({
@@ -131,7 +131,7 @@ describe("SlackService", () => {
       }).pipe(Effect.provide(TestLayer))
     )
 
-    it.scoped("updateMessage should update a message", () =>
+    it.effect("updateMessage should update a message", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.updateMessage({
@@ -143,7 +143,7 @@ describe("SlackService", () => {
       }).pipe(Effect.provide(TestLayer))
     )
 
-    it.scoped("deleteMessage should delete a message", () =>
+    it.effect("deleteMessage should delete a message", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.deleteMessage({
@@ -156,7 +156,7 @@ describe("SlackService", () => {
   })
 
   describe("Conversations methods", () => {
-    it.scoped("listConversations should return channels", () =>
+    it.effect("listConversations should return channels", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.listConversations()
@@ -165,7 +165,7 @@ describe("SlackService", () => {
       }).pipe(Effect.provide(TestLayer))
     )
 
-    it.scoped("getConversationInfo should return channel info", () =>
+    it.effect("getConversationInfo should return channel info", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.getConversationInfo({ channel: "C123" })
@@ -176,7 +176,7 @@ describe("SlackService", () => {
   })
 
   describe("Users methods", () => {
-    it.scoped("listUsers should return members", () =>
+    it.effect("listUsers should return members", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.listUsers()
@@ -185,7 +185,7 @@ describe("SlackService", () => {
       }).pipe(Effect.provide(TestLayer))
     )
 
-    it.scoped("getUserInfo should return user info", () =>
+    it.effect("getUserInfo should return user info", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.getUserInfo({ user: "U123" })
@@ -196,7 +196,7 @@ describe("SlackService", () => {
   })
 
   describe("Reactions methods", () => {
-    it.scoped("addReaction should add a reaction", () =>
+    it.effect("addReaction should add a reaction", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.addReaction({
@@ -208,7 +208,7 @@ describe("SlackService", () => {
       }).pipe(Effect.provide(TestLayer))
     )
 
-    it.scoped("removeReaction should remove a reaction", () =>
+    it.effect("removeReaction should remove a reaction", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.removeReaction({
@@ -222,7 +222,7 @@ describe("SlackService", () => {
   })
 
   describe("Files methods", () => {
-    it.scoped("uploadFile should upload a file", () =>
+    it.effect("uploadFile should upload a file", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.uploadFile({
@@ -236,7 +236,7 @@ describe("SlackService", () => {
   })
 
   describe("Generic API call", () => {
-    it.scoped("apiCall should make a generic API call", () =>
+    it.effect("apiCall should make a generic API call", () =>
       Effect.gen(function* () {
         const slack = yield* SlackService
         const result = yield* slack.apiCall("api.test")
@@ -247,14 +247,12 @@ describe("SlackService", () => {
 })
 
 describe("SlackService error handling", () => {
-  it.scoped("should handle errors from postMessage", () =>
+  it.effect("should handle errors from postMessage", () =>
     Effect.gen(function* () {
       const slack = yield* SlackService
       const result = yield* slack
         .postMessage({ channel: "C123", text: "test" })
-        .pipe(
-          Effect.catchAll((e) => Effect.succeed({ caught: true, message: (e as Error).message }))
-        )
+        .pipe(Effect.catch((e) => Effect.succeed({ caught: true, message: (e as Error).message })))
 
       assert.deepStrictEqual(result, { caught: true, message: "Caught error" })
     }).pipe(
@@ -282,7 +280,7 @@ describe("SlackService error handling", () => {
               removeReaction: postMessage,
               uploadFile: postMessage,
               apiCall: postMessage
-            } as unknown as Effect.Effect.Success<typeof SlackService.Default>
+            } as unknown as Effect.Effect.Success<typeof SlackService.make>
           })
         )
       )

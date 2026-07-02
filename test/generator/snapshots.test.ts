@@ -1,7 +1,7 @@
 import * as fs from "node:fs"
 import * as path from "node:path"
 
-import { Either } from "effect"
+import { Result } from "effect"
 import { describe, it, expect } from "vitest"
 
 import { generateServiceFile, generateIndexFile } from "../../scripts/lib/codegen.js"
@@ -13,7 +13,7 @@ const METHODS_PATH = path.join(process.cwd(), "node_modules/@slack/web-api/dist/
 // Parse real Slack methods.d.ts once for all tests
 const methodsSource = fs.readFileSync(METHODS_PATH, "utf-8")
 const parseResult = parseMethodsSource(methodsSource)
-const namespaces = Either.getOrThrow(parseResult)
+const namespaces = Result.getOrThrow(parseResult)
 
 const readCommitted = (filename: string) =>
   fs.readFileSync(path.join(GENERATED_DIR, filename), "utf-8")

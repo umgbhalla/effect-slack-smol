@@ -1,11 +1,11 @@
-import { Effect, Layer, type ConfigError } from "effect"
+import { Effect, Layer, Config } from "effect"
 import { SlackService, type SlackError } from "effect-slack"
 
 /**
  * Pre-configured layer for SlackService with environment config.
  * SlackService.Live already includes SlackConfig.fromEnv.
  */
-const SlackLive: Layer.Layer<SlackService, ConfigError.ConfigError> = SlackService.Live
+const SlackLive: Layer.Layer<SlackService, Config.ConfigError> = SlackService.Live
 
 /**
  * Run an Effect program that uses SlackService.
@@ -28,7 +28,7 @@ const SlackLive: Layer.Layer<SlackService, ConfigError.ConfigError> = SlackServi
  * ```
  */
 export const runSlackEffect = <A>(
-  program: Effect.Effect<A, SlackError | ConfigError.ConfigError, SlackService>
+  program: Effect.Effect<A, SlackError | Config.ConfigError, SlackService>
 ): Promise<A> => program.pipe(Effect.provide(SlackLive), Effect.runPromise)
 
 /**
@@ -36,5 +36,5 @@ export const runSlackEffect = <A>(
  * Useful when you need to handle errors in Express without throwing.
  */
 export const runSlackEffectExit = <A>(
-  program: Effect.Effect<A, SlackError | ConfigError.ConfigError, SlackService>
+  program: Effect.Effect<A, SlackError | Config.ConfigError, SlackService>
 ) => program.pipe(Effect.provide(SlackLive), Effect.runPromiseExit)
